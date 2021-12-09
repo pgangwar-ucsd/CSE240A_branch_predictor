@@ -45,7 +45,7 @@ uint8_t pattern_history_table[2048]; //2^13 -> max size
 uint8_t branch_history_table[2048]; //2^13 -> max size
 uint8_t meta_predictor_table[2048]; //2^13 -> max size
 
-uint8_t twoBitCounterBits = 11;
+uint8_t twoBitCounterBits = 9;
 uint8_t two_bit_hist[4096]; //2^12 -> max size
 uint8_t hierarchical_select_table[8192]; //2^13 -> max size
 
@@ -206,6 +206,8 @@ uint8_t custom_predict(uint32_t pc)
     case 5:
         return pshare_prediction;
     case 6:
+        return pshare_prediction;
+    case 7:
         return gshare_prediction;
     default:
         break;
@@ -515,15 +517,15 @@ void custom_train(uint32_t pc, uint8_t outcome)
     case 1:
             if (((outcome == TAKEN) && (pc_two_bit_counter_pred == SN || pc_two_bit_counter_pred == WN)) || ((outcome == NOTTAKEN) && (pc_two_bit_counter_pred == ST || pc_two_bit_counter_pred == WT)))
                 hierarchical_select_table[pc_gshare] = 2;
-            else if (((outcome == TAKEN) && (pc_two_bit_counter_pred == ST || pc_two_bit_counter_pred == WT)) || ((outcome == NOTTAKEN) && (pc_two_bit_counter_pred == SN || pc_two_bit_counter_pred == WN)))
-                hierarchical_select_table[pc_gshare] = 0;
+            //else if (((outcome == TAKEN) && (pc_two_bit_counter_pred == ST || pc_two_bit_counter_pred == WT)) || ((outcome == NOTTAKEN) && (pc_two_bit_counter_pred == SN || pc_two_bit_counter_pred == WN)))
+            //    hierarchical_select_table[pc_gshare] = 0;
             two_bit_train(pc, outcome);
             break;
     case 2:
             if (((outcome == TAKEN) && (pc_two_bit_counter_pred == SN || pc_two_bit_counter_pred == WN)) || ((outcome == NOTTAKEN) && (pc_two_bit_counter_pred == ST || pc_two_bit_counter_pred == WT)))
                 hierarchical_select_table[pc_gshare] = 3;
-            else if (((outcome == TAKEN) && (pc_two_bit_counter_pred == ST || pc_two_bit_counter_pred == WT)) || ((outcome == NOTTAKEN) && (pc_two_bit_counter_pred == SN || pc_two_bit_counter_pred == WN)))
-                hierarchical_select_table[pc_gshare] = 1;
+            //else if (((outcome == TAKEN) && (pc_two_bit_counter_pred == ST || pc_two_bit_counter_pred == WT)) || ((outcome == NOTTAKEN) && (pc_two_bit_counter_pred == SN || pc_two_bit_counter_pred == WN)))
+            //    hierarchical_select_table[pc_gshare] = 1;
             two_bit_train(pc, outcome);
             break;
     case 3:
@@ -545,8 +547,15 @@ void custom_train(uint32_t pc, uint8_t outcome)
                 hierarchical_select_table[pc_gshare] = 4;
             pshare_train(pc, outcome);
             break;
-
     case 6:
+            if (((outcome == TAKEN) &&  (pshare_pred == SN || pshare_pred == WN)) || ((outcome == NOTTAKEN) && (pshare_pred == ST || pshare_pred == WT)))
+                hierarchical_select_table[pc_gshare] = 7;
+            else if (((outcome == TAKEN) &&  (pshare_pred == ST || pshare_pred == WT)) || ((outcome == NOTTAKEN) && (pshare_pred == SN || pshare_pred == WN)))
+                hierarchical_select_table[pc_gshare] = 5;
+            pshare_train(pc, outcome);
+            break;
+
+    case 7:
             gshare_train(pc, outcome);
             break;
     default:

@@ -1,0 +1,27 @@
+import os
+import subprocess
+
+trace_list = ["int_1.bz2"]#, "int_2.bz2", "fp_1.bz2", "fp_2.bz2",  "mm_1.bz2", "mm_2.bz2"]
+predictor_list = ["gshare:13"]#, "tournament:9:10:10", "custom:10:9:9"]
+
+
+os.system("echo "" > temp.txt")
+for predictor in predictor_list:
+    for trace in trace_list:
+        string = "bunzip2 -kc ../traces/" + trace + " | ./predictor --" + predictor + " >> temp.txt"
+        print string
+        #output = subprocess.check_output(string)
+        os.system(string)
+
+
+os.system("grep Mispredic.* temp.txt > temp1.txt")
+
+file = open("temp1.txt" , 'r')
+
+list = []
+for val in file :
+    list.append(val)
+
+
+for val in list:
+    print(val)
