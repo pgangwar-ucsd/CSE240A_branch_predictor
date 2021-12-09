@@ -232,6 +232,10 @@ init_predictor()
     for (i=0; i<2048; i++)
     {
         pattern_history_table[i] = 0;
+    }
+
+    for (i=0; i<2048; i++)
+    {
         branch_history_table[i] = 1;
     }
 
